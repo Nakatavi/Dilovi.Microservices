@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using Identity.Application.Abstractions;
 using Identity.Domain.Enums;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -25,14 +24,16 @@ public static class AuthenticationExtensions
                     NameClaimType = "sub",
                     RoleClaimType = "role"
                 };
-                options.Events = new JwtBearerEvents { OnTokenValidated = ValidateSecurityStampAsync };
+                options.Events = new JwtBearerEvents { OnTokenValidated = ValidateSessionAsync };
             });
 
         services.AddAuthorization();
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUser, CurrentUser>();
         return services;
     }
 
-    private static async Task ValidateSecurityStampAsync(TokenValidatedContext context)
+    private static async Task ValidateSessionAsync(TokenValidatedContext context)
     {
         var userId = context.Principal?.FindFirst("sub")?.Value;
         var stamp = context.Principal?.FindFirst("security_stamp")?.Value;
@@ -48,5 +49,15 @@ public static class AuthenticationExtensions
 
         if (user is null || user.Status != UserStatus.Active || user.SecurityStamp.ToString() != stamp)
             context.Fail("Session has ended.");
+
+        var membershipClaim = context.Principal?.FindFirst("membership_id")?.Value;
+        if (membershipClaim is null)
+            return;
+
+        var memberships = context.HttpContext.RequestServices.GetRequiredService<IMembershipRepository>();
+        var available = await memberships.GetAvailableAsync(id, context.HttpContext.RequestAborted);
+
+        if (!Guid.TryParse(membershipClaim, out var membershipId) || available.All(m => m.MembershipId != membershipId))
+            context.Fail("Membership is no longer available.");
     }
 }

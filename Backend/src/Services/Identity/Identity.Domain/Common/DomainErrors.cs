@@ -9,7 +9,6 @@ public static class DomainErrors
     }
     public static class User
     {
-        public static readonly Error SuperAdminCannotBelongToTenant = new("User.SuperAdminCannotBelongToTenant", "Super admin cannot belong to a tenant.");
         public static readonly Error InvalidEmail = new("User.InvalidEmail", "A valid email is required.");
         public static readonly Error PasswordRequired = new("User.PasswordRequired", "Password is required.");
     }

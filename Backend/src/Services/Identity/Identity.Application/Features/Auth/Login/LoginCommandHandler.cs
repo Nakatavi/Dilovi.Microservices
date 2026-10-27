@@ -2,12 +2,11 @@
 
 public sealed class LoginCommandHandler(
     IUserRepository users,
-    ITenantRepository tenants,
     IRefreshTokenRepository refreshTokens,
     IPasswordHasher passwordHasher,
-    ITokenService tokenService,
     IUnitOfWork unitOfWork,
-    TimeProvider timeProvider) : IRequestHandler<LoginCommand, AuthTokens>
+    TimeProvider timeProvider,
+    SessionIssuer sessionIssuer) : IRequestHandler<LoginCommand, AuthTokens>
 {
     public async Task<AuthTokens> Handle(LoginCommand command, CancellationToken cancellationToken)
     {
@@ -20,15 +19,11 @@ public sealed class LoginCommandHandler(
 
         user.RotateSecurityStamp();
 
-        var generated = tokenService.GenerateRefreshToken();
-        var refreshToken = RefreshToken.Create(user.Id, generated.TokenHash, now);
-        refreshTokens.Add(refreshToken);
-
-        var accessToken = tokenService.CreateAccessToken(user);
+        var result = await sessionIssuer.IssueAsync(user, command.MembershipId, now,
+            ApplicationErrors.Auth.InvalidCredentials, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return new AuthTokens(accessToken.Token, accessToken.ExpiresAt, generated.Token, refreshToken.ExpiresAt);
+        return result;
     }
 
     private async Task<User> GetValidUserAsync(LoginCommand command, CancellationToken cancellationToken)
@@ -42,12 +37,6 @@ public sealed class LoginCommandHandler(
             || !passwordHasher.Verify(command.Password, user.PasswordHash))
             throw new UnauthorizedException(ApplicationErrors.Auth.InvalidCredentials);
 
-        if (user.TenantId is not null)
-        {
-            var tenant = await tenants.GetByIdAsync(user.TenantId.Value, cancellationToken);
-            if (tenant is null || tenant.Status == TenantStatus.Blocked)
-                throw new UnauthorizedException(ApplicationErrors.Auth.InvalidCredentials);
-        }
 
         return user;
     }

@@ -6,7 +6,7 @@ public sealed class AuditEntry : Entity
     public AuditAction Action { get; private set; }
     public Guid ActorUserId { get; private set; }
     public string ActorEmail { get; private set; } = null!;
-    public Guid? TargetUserId { get; private set; }
+    public Guid? TargetMembershipId { get; private set; }
     public string? Details { get; private set; }
     public DateTime OccurredAt { get; private set; }
 
@@ -17,7 +17,7 @@ public sealed class AuditEntry : Entity
         AuditAction action,
         Guid actorUserId,
         string actorEmail,
-        Guid? targetUserId,
+        Guid? targetMembershipId,
         string? details,
         DateTime occurredAt)
     {
@@ -27,7 +27,7 @@ public sealed class AuditEntry : Entity
             Action = action,
             ActorUserId = actorUserId,
             ActorEmail = actorEmail,
-            TargetUserId = targetUserId,
+            TargetMembershipId = targetMembershipId,
             Details = details,
             OccurredAt = occurredAt
         };

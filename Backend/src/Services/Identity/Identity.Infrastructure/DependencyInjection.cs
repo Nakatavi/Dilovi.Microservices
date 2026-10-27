@@ -1,9 +1,4 @@
-﻿using Identity.Infrastructure.Persistence;
-using Identity.Infrastructure.Persistence.Repositories;
-using Identity.Infrastructure.Security;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-
+﻿
 namespace Identity.Infrastructure;
 
 public static class DependencyInjection
@@ -29,6 +24,12 @@ public static class DependencyInjection
         services.AddSingleton<ITokenService, JwtTokenService>();
         services.AddScoped<ITenantRepository, TenantRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IInvitationRepository, InvitationRepository>();
+        services.AddScoped<IAuditEntryRepository, AuditEntryRepository>();
+
+        services.Configure<InvitationOptions>(configuration.GetSection(InvitationOptions.SectionName));
+        services.AddSingleton<IInvitationSender, LoggingInvitationSender>();
+        services.AddScoped<IMembershipRepository, MembershipRepository>();
 
         return services;
     }

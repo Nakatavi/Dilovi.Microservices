@@ -2,11 +2,11 @@
 
 public sealed class RefreshCommandHandler(
     IUserRepository users,
-    ITenantRepository tenants,
     IRefreshTokenRepository refreshTokens,
     ITokenService tokenService,
     IUnitOfWork unitOfWork,
-    TimeProvider timeProvider) : IRequestHandler<RefreshCommand, AuthTokens>
+    TimeProvider timeProvider,
+    SessionIssuer sessionIssuer) : IRequestHandler<RefreshCommand, AuthTokens>
 {
     public async Task<AuthTokens> Handle(RefreshCommand command, CancellationToken cancellationToken)
     {
@@ -14,7 +14,7 @@ public sealed class RefreshCommandHandler(
             throw new UnauthorizedException(ApplicationErrors.Auth.InvalidRefreshToken);
 
         var now = timeProvider.GetUtcNow().UtcDateTime;
-        var hash = tokenService.HashRefreshToken(command.RefreshToken);
+        var hash = tokenService.HashOpaqueToken(command.RefreshToken);
         var stored = await refreshTokens.GetByHashAsync(hash, cancellationToken)
             ?? throw new UnauthorizedException(ApplicationErrors.Auth.InvalidRefreshToken);
 
@@ -25,22 +25,18 @@ public sealed class RefreshCommandHandler(
             throw new UnauthorizedException(ApplicationErrors.Auth.InvalidRefreshToken);
 
         var user = await users.GetByIdAsync(stored.UserId, cancellationToken);
-        if (user is null || !await CanSignInAsync(user, cancellationToken))
+        if (user is null || user.Status != UserStatus.Active)
         {
             stored.Revoke(now);
             await unitOfWork.SaveChangesAsync(cancellationToken);
             throw new UnauthorizedException(ApplicationErrors.Auth.SessionEnded);
         }
 
-        var generated = tokenService.GenerateRefreshToken();
-        var newToken = RefreshToken.Create(user.Id, generated.TokenHash, now);
-        refreshTokens.Add(newToken);
-        stored.Revoke(now, replacedByTokenId: newToken.Id);
+        var result = await sessionIssuer.IssueAsync(user, command.MembershipId ?? stored.MembershipId, now,
+            ApplicationErrors.Auth.SessionEnded, cancellationToken, replacing: stored);
 
-        var accessToken = tokenService.CreateAccessToken(user);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return new AuthTokens(accessToken.Token, accessToken.ExpiresAt, generated.Token, newToken.ExpiresAt);
+        return result;
     }
 
     private async Task HandleRevokedTokenAsync(RefreshToken stored, DateTime now, CancellationToken cancellationToken)
@@ -53,17 +49,5 @@ public sealed class RefreshCommandHandler(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         throw new UnauthorizedException(ApplicationErrors.Auth.InvalidRefreshToken);
-    }
-
-    private async Task<bool> CanSignInAsync(User user, CancellationToken cancellationToken)
-    {
-        if (user.Status != UserStatus.Active)
-            return false;
-
-        if (user.TenantId is null)
-            return true;
-
-        var tenant = await tenants.GetByIdAsync(user.TenantId.Value, cancellationToken);
-        return tenant is not null && tenant.Status == TenantStatus.Active;
     }
 }

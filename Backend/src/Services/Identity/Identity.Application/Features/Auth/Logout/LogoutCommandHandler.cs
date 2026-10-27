@@ -11,7 +11,7 @@ public sealed class LogoutCommandHandler(
         if (string.IsNullOrWhiteSpace(command.RefreshToken))
             return;
 
-        var hash = tokenService.HashRefreshToken(command.RefreshToken);
+        var hash = tokenService.HashOpaqueToken(command.RefreshToken);
         var stored = await refreshTokens.GetByHashAsync(hash, cancellationToken);
 
         if (stored is null)

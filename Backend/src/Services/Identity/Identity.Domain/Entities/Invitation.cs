@@ -4,7 +4,7 @@ public sealed class Invitation : Entity
 {
     public static readonly TimeSpan Lifetime = TimeSpan.FromHours(24);
 
-    public Guid UserId { get; private set; }
+    public Guid MembershipId { get; private set; }
     public string Email { get; private set; } = null!;
     public string TokenHash { get; private set; } = null!;
     public InvitationStatus Status { get; private set; }
@@ -16,14 +16,14 @@ public sealed class Invitation : Entity
 
     private Invitation() { }
 
-    public static Invitation Create(Guid userId, string email, string tokenHash, Guid createdByUserId, DateTime createdAt)
+    public static Invitation Create(Guid membershipId, string email, string tokenHash, Guid createdByUserId, DateTime createdAt)
     {
         if (string.IsNullOrWhiteSpace(email) || !email.Contains('@'))
             throw new DomainException(DomainErrors.Invitation.InvalidEmail);
 
         return new Invitation
         {
-            UserId = userId,
+            MembershipId = membershipId,
             Email = email.Trim().ToLowerInvariant(),
             TokenHash = tokenHash,
             Status = InvitationStatus.Pending,
