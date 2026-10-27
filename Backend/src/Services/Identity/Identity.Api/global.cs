@@ -1,1 +1,8 @@
-﻿global using Mediator;
+﻿global using Identity.Application.Common.Exceptions;
+global using Identity.Domain.Common;
+global using Microsoft.AspNetCore.Diagnostics;
+global using Microsoft.AspNetCore.Mvc;
+global using Identity.Api.Infrastructure;
+global using Identity.Application.Features.Auth.Login;
+global using Identity.Api.Contracts.Auth;
+global using MediatR;

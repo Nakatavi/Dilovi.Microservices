@@ -5,12 +5,12 @@ public sealed class SeedSuperAdminCommandHandler(
     IUserRepository users,
     IUnitOfWork unitOfWork,
     IPasswordHasher passwordHasher,
-    TimeProvider timeProvider) : ICommandHandler<SeedSuperAdminCommand>
+    TimeProvider timeProvider) : IRequestHandler<SeedSuperAdminCommand>
 {
-    public async ValueTask<Unit> Handle(SeedSuperAdminCommand command, CancellationToken cancellationToken)
+    public async Task Handle(SeedSuperAdminCommand command, CancellationToken cancellationToken)
     {
         if (await users.SuperAdminExistsAsync(cancellationToken))
-            return Unit.Value;
+            return;
 
         var superAdmin = User.CreateSuperAdmin(
             command.Email,
@@ -20,6 +20,6 @@ public sealed class SeedSuperAdminCommandHandler(
         users.Add(superAdmin);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Unit.Value;
+        return;
     }
 }
