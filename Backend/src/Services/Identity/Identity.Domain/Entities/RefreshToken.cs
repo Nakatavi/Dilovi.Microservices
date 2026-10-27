@@ -10,17 +10,19 @@ public sealed class RefreshToken : Entity
     public DateTime ExpiresAt { get; private set; }
     public DateTime? RevokedAt { get; private set; }
     public Guid? ReplacedByTokenId { get; private set; }
+    public Guid? MembershipId { get; private set; }
 
     private RefreshToken() { }
 
-    public static RefreshToken Create(Guid userId, string tokenHash, DateTime createdAt)
+    public static RefreshToken Create(Guid userId, Guid? membershipId, string tokenHash, DateTime createdAt)
     {
         return new RefreshToken
         {
             UserId = userId,
             TokenHash = tokenHash,
             CreatedAt = createdAt,
-            ExpiresAt = createdAt + Lifetime
+            ExpiresAt = createdAt + Lifetime,
+            MembershipId = membershipId
         };
     }
 

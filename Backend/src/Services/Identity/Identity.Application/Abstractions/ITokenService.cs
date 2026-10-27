@@ -3,11 +3,11 @@ namespace Identity.Application.Abstractions;
 
 public interface ITokenService
 {
-    AccessToken CreateAccessToken(User user);
-    GeneratedRefreshToken GenerateRefreshToken();
-    string HashRefreshToken(string refreshToken);
+    AccessToken CreateAccessToken(User user, AvailableMembership? membership);
+    GeneratedToken GenerateOpaqueToken();
+    string HashOpaqueToken(string opaqueToken);
 }
 
 public sealed record AccessToken(string Token, DateTime ExpiresAt);
 
-public sealed record GeneratedRefreshToken(string Token, string TokenHash);
+public sealed record GeneratedToken(string Token, string TokenHash);

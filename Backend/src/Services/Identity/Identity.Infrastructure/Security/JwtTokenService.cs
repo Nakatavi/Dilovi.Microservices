@@ -10,7 +10,7 @@ internal sealed class JwtTokenService(IOptions<JwtOptions> options, TimeProvider
 {
     private readonly JwtOptions _options = options.Value;
 
-    public AccessToken CreateAccessToken(User user)
+    public AccessToken CreateAccessToken(User user, AvailableMembership? membership)
     {
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var expiresAt = now.AddMinutes(_options.AccessTokenLifetimeMinutes);
@@ -18,13 +18,20 @@ internal sealed class JwtTokenService(IOptions<JwtOptions> options, TimeProvider
         var claims = new Dictionary<string, object>
         {
             [JwtRegisteredClaimNames.Sub] = user.Id.ToString(),
-            [JwtRegisteredClaimNames.Email] = user.Email!,
-            ["role"] = user.Role.ToString(),
+            [JwtRegisteredClaimNames.Email] = user.Email,
             ["security_stamp"] = user.SecurityStamp.ToString()
         };
 
-        if (user.TenantId is not null)
-            claims["tenant_id"] = user.TenantId.Value.ToString();
+        if (user.IsSuperAdmin)
+        {
+            claims["role"] = "SuperAdmin";
+        }
+        else if (membership is not null)
+        {
+            claims["role"] = membership.Role.ToString();
+            claims["membership_id"] = membership.MembershipId.ToString();
+            claims["tenant_id"] = membership.TenantId.ToString();
+        }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SigningKey));
 
@@ -42,12 +49,12 @@ internal sealed class JwtTokenService(IOptions<JwtOptions> options, TimeProvider
         return new AccessToken(new JsonWebTokenHandler().CreateToken(descriptor), expiresAt);
     }
 
-    public GeneratedRefreshToken GenerateRefreshToken()
+    public GeneratedToken GenerateOpaqueToken()
     {
         var token = Base64UrlEncoder.Encode(RandomNumberGenerator.GetBytes(64));
-        return new GeneratedRefreshToken(token, HashRefreshToken(token));
+        return new GeneratedToken(token, HashOpaqueToken(token));
     }
 
-    public string HashRefreshToken(string refreshToken)
-        => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken)));
+    public string HashOpaqueToken(string opaqueToken)
+        => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(opaqueToken)));
 }

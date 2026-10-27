@@ -12,11 +12,11 @@ internal sealed class InvitationConfiguration : IEntityTypeConfiguration<Invitat
         builder.Property(i => i.Status).HasConversion<string>().HasMaxLength(20);
 
         builder.HasIndex(i => i.TokenHash).IsUnique();
-        builder.HasIndex(i => new { i.UserId, i.Status });
+        builder.HasIndex(i => new { i.MembershipId, i.Status });
 
-        builder.HasOne<User>()
+        builder.HasOne<Membership>()
             .WithMany()
-            .HasForeignKey(i => i.UserId)
+            .HasForeignKey(i => i.MembershipId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne<User>()

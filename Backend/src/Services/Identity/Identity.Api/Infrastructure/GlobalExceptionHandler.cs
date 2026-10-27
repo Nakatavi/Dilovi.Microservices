@@ -10,6 +10,7 @@ internal sealed class GlobalExceptionHandler(
         var (status, error) = exception switch
         {
             DomainException e => (StatusCodes.Status422UnprocessableEntity, e.Error),
+            ConflictException e => (StatusCodes.Status409Conflict, e.Error),
             UnauthorizedException e => (StatusCodes.Status401Unauthorized, e.Error),
             _ => (StatusCodes.Status500InternalServerError, new Error("Server.Error", "An unexpected error occurred."))
         };

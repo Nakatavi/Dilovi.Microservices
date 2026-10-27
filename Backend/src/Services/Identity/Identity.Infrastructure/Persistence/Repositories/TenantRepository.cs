@@ -4,4 +4,6 @@ internal sealed class TenantRepository(IdentityDbContext context) : ITenantRepos
 {
     public Task<Tenant?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         => context.Tenants.FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+
+    public void Add(Tenant tenant) => context.Tenants.Add(tenant);
 }

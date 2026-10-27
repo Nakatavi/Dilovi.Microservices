@@ -8,6 +8,7 @@ public sealed class IdentityDbContext(DbContextOptions<IdentityDbContext> option
     public DbSet<Invitation> Invitations => Set<Invitation>();
     public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Membership> Memberships => Set<Membership>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
