@@ -2,6 +2,7 @@
 using Identity.Application.Features.Auth;
 using Identity.Application.Features.Auth.Logout;
 using Identity.Application.Features.Auth.Refresh;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Identity.Api.Controllers;
 
@@ -47,6 +48,15 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
         return NoContent();
     }
 
+    [Authorize]
+    [HttpGet("me")]
+    public IActionResult Me() => Ok(new
+    {
+        UserId = User.FindFirst("sub")?.Value,
+        Email = User.FindFirst("email")?.Value,
+        Role = User.FindFirst("role")?.Value,
+        TenantId = User.FindFirst("tenant_id")?.Value
+    });
 
     private void SetRefreshTokenCookie(AuthTokens tokens)
     {

@@ -6,3 +6,4 @@ global using Identity.Api.Infrastructure;
 global using Identity.Application.Features.Auth.Login;
 global using Identity.Api.Contracts.Auth;
 global using MediatR;
+global using Microsoft.OpenApi;
