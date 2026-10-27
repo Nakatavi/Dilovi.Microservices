@@ -1,23 +1,44 @@
-var builder = WebApplication.CreateBuilder(args);
+using Serilog;
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
+try
 {
-    app.MapOpenApi();
+    Log.Information("Starting Identity.Api");
+
+    var builder = WebApplication.CreateBuilder(args);
+
+    builder.Services.AddSerilog((services, configuration) => configuration
+        .ReadFrom.Configuration(builder.Configuration)
+        .ReadFrom.Services(services));
+
+    builder.Services.AddControllers();
+    builder.Services.AddOpenApi();
+
+    var app = builder.Build();
+
+    app.UseSerilogRequestLogging();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.MapOpenApi();
+        app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "Identity API v1"));
+    }
+
+    app.UseHttpsRedirection();
+    app.UseAuthorization();
+    app.MapControllers();
+
+    app.Run();
+
 }
+catch (Exception ex) when (ex is not HostAbortedException)
+{
 
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+    Log.Fatal(ex, "Identity.Api terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
