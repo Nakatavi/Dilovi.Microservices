@@ -1,4 +1,6 @@
 ﻿using Identity.Infrastructure.Persistence;
+using Identity.Infrastructure.Persistence.Repositories;
+using Identity.Infrastructure.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,6 +15,11 @@ public static class DependencyInjection
 
         services.AddDbContext<IdentityDbContext>(options =>
             options.UseSqlServer(connectionString, sql => sql.MigrationsAssembly("Identity.Migrations")));
+
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
+        services.AddSingleton(TimeProvider.System);
 
         return services;
     }

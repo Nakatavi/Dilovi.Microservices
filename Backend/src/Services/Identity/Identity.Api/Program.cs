@@ -1,5 +1,6 @@
 using Identity.Api.Extensions;
 using Identity.Infrastructure;
+using Identity.Application;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -15,6 +16,8 @@ try
 
     builder.Services.AddControllers();
     builder.Services.AddApiDocumentation();
+    builder.Services.AddApplication();
+    builder.Services.AddMediatorHandlers();
 
     builder.Services.AddInfrastructure(builder.Configuration);
 
@@ -27,6 +30,7 @@ try
     app.UseHttpsRedirection();
     app.UseAuthorization();
     app.MapControllers();
+    await app.SeedSuperAdminAsync();
 
     app.Run();
 
