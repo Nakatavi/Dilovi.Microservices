@@ -58,4 +58,5 @@ public sealed class User : Entity
         DeactivatedAt = deactivatedAt;
         SecurityStamp = Guid.NewGuid();
     }
+    public void RotateSecurityStamp() => SecurityStamp = Guid.NewGuid();
 }

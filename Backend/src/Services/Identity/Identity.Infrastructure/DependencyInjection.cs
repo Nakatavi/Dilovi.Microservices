@@ -21,6 +21,15 @@ public static class DependencyInjection
         services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
         services.AddSingleton(TimeProvider.System);
 
+        services.AddOptions<JwtOptions>()
+            .Bind(configuration.GetSection(JwtOptions.SectionName))
+            .Validate(o => o.SigningKey.Length >= 32, "Jwt:SigningKey must be at least 32 characters.")
+            .ValidateOnStart();
+
+        services.AddSingleton<ITokenService, JwtTokenService>();
+        services.AddScoped<ITenantRepository, TenantRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
         return services;
     }
 }

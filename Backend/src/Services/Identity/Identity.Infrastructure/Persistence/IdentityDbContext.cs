@@ -7,6 +7,7 @@ public sealed class IdentityDbContext(DbContextOptions<IdentityDbContext> option
     public DbSet<User> Users => Set<User>();
     public DbSet<Invitation> Invitations => Set<Invitation>();
     public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

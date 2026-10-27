@@ -20,9 +20,11 @@ try
     builder.Services.AddMediatorHandlers();
 
     builder.Services.AddInfrastructure(builder.Configuration);
+    builder.Services.AddErrorHandling();
 
     var app = builder.Build();
 
+    app.UseExceptionHandler();
     app.UseSerilogRequestLogging();
 
     app.UseApiDocumentation();

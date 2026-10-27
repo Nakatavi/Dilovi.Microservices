@@ -27,8 +27,4 @@
     <ProjectReference Include="..\Identity.Migrations\Identity.Migrations.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
 </Project>

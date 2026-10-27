@@ -7,4 +7,9 @@ internal sealed class UserRepository(IdentityDbContext context) : IUserRepositor
         => context.Users.AnyAsync(u => u.Role == UserRole.SuperAdmin, cancellationToken);
 
     public void Add(User user) => context.Users.Add(user);
+    public Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
+    => context.Users.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+
+    public Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    => context.Users.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
 }
