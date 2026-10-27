@@ -1,6 +1,6 @@
-﻿namespace Identity.Application.Features.Auth.Login;
+﻿namespace Identity.Application.Features.Auth;
 
-public sealed record LoginResult(
+public sealed record AuthTokens(
     string AccessToken,
     DateTime AccessTokenExpiresAt,
     string RefreshToken,

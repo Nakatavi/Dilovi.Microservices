@@ -17,7 +17,6 @@ try
     builder.Services.AddControllers();
     builder.Services.AddApiDocumentation();
     builder.Services.AddApplication();
-    builder.Services.AddMediatorHandlers();
 
     builder.Services.AddInfrastructure(builder.Configuration);
     builder.Services.AddErrorHandling();

@@ -1,5 +1,4 @@
-﻿
-namespace Identity.Application.Features.Auth.Login;
+﻿namespace Identity.Application.Features.Auth.Login;
 
 public sealed class LoginCommandHandler(
     IUserRepository users,
@@ -8,9 +7,9 @@ public sealed class LoginCommandHandler(
     IPasswordHasher passwordHasher,
     ITokenService tokenService,
     IUnitOfWork unitOfWork,
-    TimeProvider timeProvider) : ICommandHandler<LoginCommand, LoginResult>
+    TimeProvider timeProvider) : IRequestHandler<LoginCommand, AuthTokens>
 {
-    public async ValueTask<LoginResult> Handle(LoginCommand command, CancellationToken cancellationToken)
+    public async Task<AuthTokens> Handle(LoginCommand command, CancellationToken cancellationToken)
     {
         var user = await GetValidUserAsync(command, cancellationToken);
 
@@ -29,7 +28,7 @@ public sealed class LoginCommandHandler(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new LoginResult(accessToken.Token, accessToken.ExpiresAt, generated.Token, refreshToken.ExpiresAt);
+        return new AuthTokens(accessToken.Token, accessToken.ExpiresAt, generated.Token, refreshToken.ExpiresAt);
     }
 
     private async Task<User> GetValidUserAsync(LoginCommand command, CancellationToken cancellationToken)

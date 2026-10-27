@@ -1,4 +1,3 @@
-﻿
-namespace Identity.Application.Features.Auth.Login;
+﻿namespace Identity.Application.Features.Auth.Login;
 
-public sealed record LoginCommand(string Email, string Password) : ICommand<LoginResult>;
+public sealed record LoginCommand(string Email, string Password) : IRequest<AuthTokens>;
