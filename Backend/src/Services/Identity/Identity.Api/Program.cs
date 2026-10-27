@@ -1,3 +1,5 @@
+using Identity.Api.Extensions;
+using Identity.Infrastructure;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -9,22 +11,18 @@ try
 
     var builder = WebApplication.CreateBuilder(args);
 
-    builder.Services.AddSerilog((services, configuration) => configuration
-        .ReadFrom.Configuration(builder.Configuration)
-        .ReadFrom.Services(services));
+    builder.Services.AddSerilogLogging(builder.Configuration);
 
     builder.Services.AddControllers();
-    builder.Services.AddOpenApi();
+    builder.Services.AddApiDocumentation();
+
+    builder.Services.AddInfrastructure(builder.Configuration);
 
     var app = builder.Build();
 
     app.UseSerilogRequestLogging();
 
-    if (app.Environment.IsDevelopment())
-    {
-        app.MapOpenApi();
-        app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "Identity API v1"));
-    }
+    app.UseApiDocumentation();
 
     app.UseHttpsRedirection();
     app.UseAuthorization();
