@@ -1,11 +1,11 @@
-﻿namespace Identity.Application.Features.Tenants.RegisterTenant;
+﻿
+namespace Identity.Application.Features.Tenants.RegisterTenant;
 
 public sealed class RegisterTenantCommandHandler(
     ITenantRepository tenants,
     IMembershipRepository memberships,
-    IInvitationRepository invitations,
     IAuditEntryRepository auditEntries,
-    ITokenService tokenService,
+    InvitationIssuer invitationIssuer,
     IInvitationSender invitationSender,
     ICurrentUser currentUser,
     IUnitOfWork unitOfWork,
@@ -13,28 +13,21 @@ public sealed class RegisterTenantCommandHandler(
 {
     public async Task<Guid> Handle(RegisterTenantCommand command, CancellationToken cancellationToken)
     {
-        var email = command.ChairmanEmail.Trim().ToLowerInvariant();
-
-
         var now = timeProvider.GetUtcNow().UtcDateTime;
 
         var tenant = Tenant.Create(command.Name, now);
         tenants.Add(tenant);
 
+        auditEntries.Add(AuditEntry.Create(tenant.Id, AuditAction.TenantCreated,
+            currentUser.UserId, currentUser.Email, null, $"Tenant: {tenant.Name}", now));
+
         var chairmanPosition = Membership.Create(tenant.Id, MembershipRole.Chairman, now);
         memberships.Add(chairmanPosition);
 
-        var token = tokenService.GenerateOpaqueToken();
-        invitations.Add(Invitation.Create(chairmanPosition.Id, email, token.TokenHash, currentUser.UserId, now));
-
-        auditEntries.Add(AuditEntry.Create(tenant.Id, AuditAction.TenantCreated,
-            currentUser.UserId, currentUser.Email, null, $"Tenant: {tenant.Name}", now));
-        auditEntries.Add(AuditEntry.Create(tenant.Id, AuditAction.InvitationSent,
-            currentUser.UserId, currentUser.Email, chairmanPosition.Id, $"Chairman: {email}", now));
+        var token = await invitationIssuer.IssueAsync(chairmanPosition, command.ChairmanEmail, now, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        await invitationSender.SendAsync(email, token.Token, cancellationToken);
+        await invitationSender.SendAsync(command.ChairmanEmail.Trim().ToLowerInvariant(), token, cancellationToken);
 
         return tenant.Id;
     }

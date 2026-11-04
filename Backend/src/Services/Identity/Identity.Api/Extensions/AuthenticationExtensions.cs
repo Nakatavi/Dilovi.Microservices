@@ -1,12 +1,14 @@
-﻿using System.Text;
-using Identity.Domain.Enums;
+﻿using Identity.Domain.Enums;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Identity.Api.Extensions;
 
 public static class AuthenticationExtensions
 {
+    public const string PasswordSetupPolicy = "PasswordSetup";
     public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         var jwt = configuration.GetSection("Jwt");
@@ -27,7 +29,15 @@ public static class AuthenticationExtensions
                 options.Events = new JwtBearerEvents { OnTokenValidated = ValidateSessionAsync };
             });
 
-        services.AddAuthorization();
+        services.AddAuthorization(options =>
+        {
+            options.DefaultPolicy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .RequireAssertion(context => !context.User.HasClaim("password_required", "true"))
+                .Build();
+
+            options.AddPolicy(PasswordSetupPolicy, policy => policy.RequireAuthenticatedUser());
+        });
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();
         return services;

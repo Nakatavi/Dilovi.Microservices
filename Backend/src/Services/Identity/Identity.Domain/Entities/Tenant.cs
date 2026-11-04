@@ -32,4 +32,12 @@ public sealed class Tenant : Entity
         Status = TenantStatus.Active;
         UnblockedAt = unblockedAt;
     }
+
+    public void Rename(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new DomainException(DomainErrors.Tenant.NameRequired);
+
+        Name = name.Trim();
+    }
 }

@@ -11,6 +11,9 @@ internal sealed class GlobalExceptionHandler(
         {
             DomainException e => (StatusCodes.Status422UnprocessableEntity, e.Error),
             ConflictException e => (StatusCodes.Status409Conflict, e.Error),
+            NotFoundException e => (StatusCodes.Status404NotFound, e.Error),
+            ForbiddenException e => (StatusCodes.Status403Forbidden, e.Error),
+            ValidationException e => (StatusCodes.Status400BadRequest, e.Error),
             UnauthorizedException e => (StatusCodes.Status401Unauthorized, e.Error),
             _ => (StatusCodes.Status500InternalServerError, new Error("Server.Error", "An unexpected error occurred."))
         };

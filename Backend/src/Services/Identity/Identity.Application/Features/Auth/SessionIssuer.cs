@@ -9,7 +9,6 @@ public sealed class SessionIssuer(
         User user,
         Guid? preferredMembershipId,
         DateTime now,
-        Error noMembershipsError,
         CancellationToken cancellationToken,
         RefreshToken? replacing = null)
     {
@@ -20,11 +19,8 @@ public sealed class SessionIssuer(
         AvailableMembership? current = null;
         if (!user.IsSuperAdmin)
         {
-            if (available.Count == 0)
-                throw new UnauthorizedException(noMembershipsError);
-
-            current = available.FirstOrDefault(m => m.MembershipId == preferredMembershipId) ?? available[0];
-        }
+            current = available.FirstOrDefault(m => m.MembershipId == preferredMembershipId) ?? available.FirstOrDefault();
+        }            
 
         var generated = tokenService.GenerateOpaqueToken();
         var refreshToken = RefreshToken.Create(user.Id, current?.MembershipId, generated.TokenHash, now);

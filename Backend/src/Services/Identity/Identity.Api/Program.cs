@@ -1,7 +1,7 @@
-using Identity.Api.Extensions;
-using Identity.Infrastructure;
 using Identity.Application;
+using Identity.Infrastructure;
 using Serilog;
+using System.Text.Json.Serialization;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -14,7 +14,8 @@ try
 
     builder.Services.AddSerilogLogging(builder.Configuration);
 
-    builder.Services.AddControllers();
+    builder.Services.AddControllers()
+     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
     builder.Services.AddApiDocumentation();
     builder.Services.AddApplication();
     builder.Services.AddJwtAuthentication(builder.Configuration);
@@ -24,8 +25,8 @@ try
 
     var app = builder.Build();
 
-    app.UseExceptionHandler();
     app.UseSerilogRequestLogging();
+    app.UseExceptionHandler();
     app.UseApiDocumentation();
     app.UseHttpsRedirection();
     app.UseAuthentication();
