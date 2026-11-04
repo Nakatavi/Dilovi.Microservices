@@ -4,7 +4,7 @@ public sealed class AuditEntry : Entity
 {
     public Guid? TenantId { get; private set; }
     public AuditAction Action { get; private set; }
-    public Guid ActorUserId { get; private set; }
+    public Guid? ActorUserId { get; private set; }
     public string ActorEmail { get; private set; } = null!;
     public Guid? TargetMembershipId { get; private set; }
     public string? Details { get; private set; }
@@ -15,7 +15,7 @@ public sealed class AuditEntry : Entity
     public static AuditEntry Create(
         Guid? tenantId,
         AuditAction action,
-        Guid actorUserId,
+        Guid? actorUserId,
         string actorEmail,
         Guid? targetMembershipId,
         string? details,

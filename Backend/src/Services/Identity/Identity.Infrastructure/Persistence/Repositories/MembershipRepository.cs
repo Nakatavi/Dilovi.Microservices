@@ -13,4 +13,9 @@ internal sealed class MembershipRepository(IdentityDbContext context) : IMembers
             orderby t.Name
             select new AvailableMembership(m.Id, t.Id, t.Name, m.Role))
            .ToListAsync(cancellationToken);
+    public Task<Membership?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    => context.Memberships.FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+
+    public Task<bool> ExistsAsync(Guid tenantId, MembershipRole role, CancellationToken cancellationToken)
+    => context.Memberships.AnyAsync(m => m.TenantId == tenantId && m.Role == role, cancellationToken);
 }

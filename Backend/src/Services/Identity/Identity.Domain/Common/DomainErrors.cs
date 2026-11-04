@@ -11,11 +11,12 @@ public static class DomainErrors
     {
         public static readonly Error InvalidEmail = new("User.InvalidEmail", "A valid email is required.");
         public static readonly Error PasswordRequired = new("User.PasswordRequired", "Password is required.");
+        public static readonly Error PasswordAlreadySet = new("User.PasswordAlreadySet", "Password has already been set.");
     }
     public static class Invitation
     {
         public static readonly Error InvalidEmail = new("Invitation.InvalidEmail", "A valid email is required.");
-        public static readonly Error NotPending = new("Invitation.NotPending", "Invitation has already been used or cancelled.");
+        public static readonly Error NotPending = new("Invitation.NotPending", "Invitation has already been used, declined or cancelled.");
         public static readonly Error Expired = new("Invitation.Expired", "Invitation has expired.");
     }
 }

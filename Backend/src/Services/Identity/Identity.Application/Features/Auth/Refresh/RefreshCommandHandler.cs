@@ -32,8 +32,7 @@ public sealed class RefreshCommandHandler(
             throw new UnauthorizedException(ApplicationErrors.Auth.SessionEnded);
         }
 
-        var result = await sessionIssuer.IssueAsync(user, command.MembershipId ?? stored.MembershipId, now,
-            ApplicationErrors.Auth.SessionEnded, cancellationToken, replacing: stored);
+        var result = await sessionIssuer.IssueAsync(user, command.MembershipId ?? stored.MembershipId, now, cancellationToken, replacing: stored);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return result;

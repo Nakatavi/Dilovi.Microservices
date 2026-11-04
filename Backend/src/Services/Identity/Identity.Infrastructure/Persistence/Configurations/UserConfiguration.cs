@@ -9,7 +9,7 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Id).ValueGeneratedNever();
 
         builder.Property(u => u.Email).HasMaxLength(256).IsRequired();
-        builder.Property(u => u.PasswordHash).HasMaxLength(200).IsRequired();
+        builder.Property(u => u.PasswordHash).HasMaxLength(200);
         builder.Property(u => u.Status).HasConversion<string>().HasMaxLength(20);
 
         builder.HasIndex(u => u.Email).IsUnique();

@@ -5,3 +5,5 @@ global using Identity.Application.Common;
 global using Identity.Application.Common.Exceptions;
 global using Identity.Domain.Enums;
 global using MediatR;
+global using Identity.Application.Features.Invitations;
+global using Identity.Application.Features.Auth;

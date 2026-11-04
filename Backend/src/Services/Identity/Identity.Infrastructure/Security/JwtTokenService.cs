@@ -33,6 +33,9 @@ internal sealed class JwtTokenService(IOptions<JwtOptions> options, TimeProvider
             claims["tenant_id"] = membership.TenantId.ToString();
         }
 
+        if (!user.HasPassword)
+            claims["password_required"] = "true";
+
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SigningKey));
 
         var descriptor = new SecurityTokenDescriptor

@@ -19,8 +19,7 @@ public sealed class LoginCommandHandler(
 
         user.RotateSecurityStamp();
 
-        var result = await sessionIssuer.IssueAsync(user, command.MembershipId, now,
-            ApplicationErrors.Auth.InvalidCredentials, cancellationToken);
+        var result = await sessionIssuer.IssueAsync(user, command.MembershipId, now, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return result;

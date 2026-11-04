@@ -13,6 +13,7 @@ public sealed class Invitation : Entity
     public DateTime ExpiresAt { get; private set; }
     public DateTime? AcceptedAt { get; private set; }
     public DateTime? CancelledAt { get; private set; }
+    public DateTime? DeclinedAt { get; private set; }
 
     private Invitation() { }
 
@@ -37,11 +38,7 @@ public sealed class Invitation : Entity
 
     public void Accept(DateTime acceptedAt)
     {
-        if (Status != InvitationStatus.Pending)
-            throw new DomainException(DomainErrors.Invitation.NotPending);
-
-        if (IsExpired(acceptedAt))
-            throw new DomainException(DomainErrors.Invitation.Expired);
+        EnsureCanBeUsed(acceptedAt);
 
         Status = InvitationStatus.Accepted;
         AcceptedAt = acceptedAt;
@@ -54,5 +51,21 @@ public sealed class Invitation : Entity
 
         Status = InvitationStatus.Cancelled;
         CancelledAt = cancelledAt;
+    }
+    public void Decline(DateTime declinedAt)
+    {
+        EnsureCanBeUsed(declinedAt);
+
+        Status = InvitationStatus.Declined;
+        DeclinedAt = declinedAt;
+    }
+
+    private void EnsureCanBeUsed(DateTime now)
+    {
+        if (Status != InvitationStatus.Pending)
+            throw new DomainException(DomainErrors.Invitation.NotPending);
+
+        if (IsExpired(now))
+            throw new DomainException(DomainErrors.Invitation.Expired);
     }
 }
