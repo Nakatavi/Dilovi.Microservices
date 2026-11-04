@@ -9,5 +9,6 @@ public enum AuditAction
     InvitationCancelled = 5,
     InvitationAccepted = 6,
     MembershipDeactivated = 7,
-    InvitationDeclined = 8
+    InvitationDeclined = 8,
+    TenantRenamed = 9
 }

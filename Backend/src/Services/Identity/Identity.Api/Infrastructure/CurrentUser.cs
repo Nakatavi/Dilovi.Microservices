@@ -2,6 +2,7 @@
 
 internal sealed class CurrentUser(IHttpContextAccessor httpContextAccessor) : ICurrentUser
 {
+    public string? Role => FindClaim("role");
     public Guid UserId => Guid.Parse(GetRequiredClaim("sub"));
     public string Email => GetRequiredClaim("email");
     public Guid? TenantId => GetOptionalGuid("tenant_id");

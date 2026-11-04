@@ -6,4 +6,5 @@ public interface ICurrentUser
     string Email { get; }
     Guid? TenantId { get; }
     Guid? MembershipId { get; }
+    string? Role { get; }
 }

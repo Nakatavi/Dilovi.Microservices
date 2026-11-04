@@ -30,5 +30,14 @@ public static class ApplicationErrors
         public static readonly Error AlreadyExists = new("Positions.AlreadyExists", "This position already exists in the tenant.");
         public static readonly Error ChairmanNotAllowed = new("Positions.ChairmanNotAllowed", "The chairman position is created together with the tenant.");
         public static readonly Error TenantRequired = new("Positions.TenantRequired", "Select a tenant first.");
+        public static readonly Error NotFound = new("Positions.NotFound", "Position was not found.");
+        public static readonly Error Forbidden = new("Positions.Forbidden", "You are not allowed to manage this position.");
+        public static readonly Error AlreadyHeld = new("Positions.AlreadyHeld", "This person already holds the position.");
+    }
+
+    public static class Tenants
+    {
+        public static readonly Error NotFound = new("Tenants.NotFound", "Tenant was not found.");
+        public static readonly Error Forbidden = new("Tenants.Forbidden", "You are not allowed to access this tenant.");
     }
 }

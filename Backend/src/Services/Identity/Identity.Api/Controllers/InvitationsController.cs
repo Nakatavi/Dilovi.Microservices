@@ -1,5 +1,7 @@
 ﻿
 
+using Identity.Application.Features.Invitations.CancelInvitation;
+
 namespace Identity.Api.Controllers;
 
 [ApiController]
@@ -45,6 +47,14 @@ public sealed class InvitationsController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> Decline(Guid id, CancellationToken cancellationToken)
     {
         await mediator.Send(new DeclineInvitationCommand(id), cancellationToken);
+        return NoContent();
+    }
+
+    [Authorize(Roles = "SuperAdmin,Chairman")]
+    [HttpPost("{id:guid}/cancel")]
+    public async Task<IActionResult> Cancel(Guid id, CancellationToken cancellationToken)
+    {
+        await mediator.Send(new CancelInvitationCommand(id), cancellationToken);
         return NoContent();
     }
 }

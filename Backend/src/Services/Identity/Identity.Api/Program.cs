@@ -25,8 +25,8 @@ try
 
     var app = builder.Build();
 
-    app.UseExceptionHandler();
     app.UseSerilogRequestLogging();
+    app.UseExceptionHandler();
     app.UseApiDocumentation();
     app.UseHttpsRedirection();
     app.UseAuthentication();
