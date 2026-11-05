@@ -7,4 +7,11 @@
     <Project Path="src/Services/Identity/Identity.Infrastructure/Identity.Infrastructure.csproj" Id="b4da5dc3-b601-4c71-94cf-1b686ba111d0" />
     <Project Path="src/Services/Identity/Identity.Migrations/Identity.Migrations.csproj" Id="2f6aced9-ab5a-4e07-ba09-d25b92caf5c0" />
   </Folder>
+  <Folder Name="/Services/Notification/">
+    <Project Path="src/Services/Notification/Notification.Api/Notification.Api.csproj" Id="da68e55d-71c9-4272-8e2a-5fb271218398" />
+    <Project Path="src/Services/Notification/Notification.Application/Notification.Application.csproj" Id="770aa735-98ea-427d-af36-abd12ae3becb" />
+    <Project Path="src/Services/Notification/Notification.Domain/Notification.Domain.csproj" Id="b355bd33-d35e-462a-b602-fef6d0aa2dd4" />
+    <Project Path="src/Services/Notification/Notification.Infrastructure/Notification.Infrastructure.csproj" Id="778503e8-21fb-4371-b7fe-7a0258dd4964" />
+    <Project Path="src/Services/Notification/Notification.Migrations/Notification.Migrations.csproj" Id="0592e98c-a2b1-4af8-a0bd-44200049cafd" />
+  </Folder>
 </Solution>
